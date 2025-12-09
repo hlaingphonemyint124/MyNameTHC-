@@ -137,15 +137,99 @@ export const Navbar = () => {
           </div>
 
           {/* Mobile Navigation */}
-          <div className="flex md:hidden items-center gap-2">
-            <ThemeToggle />
+          {/* Mobile Navigation */}
+<div className="flex md:hidden items-center gap-2">
+  <ThemeToggle />
 
-            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-white">
-                  <Menu className="h-6 w-6" />
+  <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+    <SheetTrigger asChild>
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        className="text-white hover:text-accent"
+      >
+        <Menu className="h-6 w-6" />
+      </Button>
+    </SheetTrigger>
+
+    {/* Fullscreen overlay */}
+    <SheetContent 
+      side="top" 
+      className="h-screen w-screen bg-black/70 backdrop-blur-xl border-none flex items-center justify-center p-0"
+    >
+      {/* Center popup card */}
+      <div className="bg-black/80 w-[90%] max-w-md rounded-xl p-6 space-y-6 shadow-2xl border border-white/10">
+
+        {/* Navigation */}
+        <div className="flex flex-col gap-4 text-lg font-medium">
+          {navLinks.map((link) => (
+            <SheetClose asChild key={link.path}>
+              <Link
+                to={link.path}
+                className={`transition-all hover:text-accent ${
+                  isActive(link.path) ? "text-accent" : "text-white"
+                }`}
+              >
+                {link.label}
+              </Link>
+            </SheetClose>
+          ))}
+        </div>
+
+        <div className="border-t border-white/10 pt-4 space-y-3">
+          {user ? (
+            <>
+              <p className="text-sm text-gray-400 truncate">{user.email}</p>
+
+              <SheetClose asChild>
+                <Link 
+                  to="/profile" 
+                  className="flex items-center gap-2 hover:text-accent text-white"
+                >
+                  <User className="h-4 w-4"/>
+                  Profile Settings
+                </Link>
+              </SheetClose>
+
+              {isAdmin && (
+                <SheetClose asChild>
+                  <Link 
+                    to="/admin" 
+                    className="flex items-center gap-2 hover:text-accent text-white"
+                  >
+                    <Shield className="h-4 w-4"/>
+                    Admin Dashboard
+                  </Link>
+                </SheetClose>
+              )}
+
+              <Button 
+                variant="destructive" 
+                className="w-full mt-3"
+                onClick={() => {
+                  handleSignOut();
+                  setMobileMenuOpen(false);
+                }}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign Out
+              </Button>
+            </>
+          ) : (
+            <SheetClose asChild>
+              <Link to="/auth">
+                <Button variant="premium" className="w-full">
+                  Sign In
                 </Button>
-              </SheetTrigger>
+              </Link>
+            </SheetClose>
+          )}
+        </div>
+      </div>
+    </SheetContent>
+  </Sheet>
+</div>
+
 
               {/* ✅ FIXED RESPONSIVE SIDEBAR */}
               <SheetContent
