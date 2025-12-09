@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { LogOut, User, Shield, Menu, X } from "lucide-react";
+import { LogOut, User, Shield, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
@@ -27,18 +27,15 @@ export const Navbar = () => {
   const { isAdmin } = useAdmin();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
+
   const isActive = (path: string) => location.pathname === path;
-  
+
   const handleSignOut = async () => {
     await signOut();
   };
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -49,40 +46,37 @@ export const Navbar = () => {
     { path: "/about", label: "About" },
     { path: "/contact", label: "Contact" },
   ];
-  
+
   return (
-    <nav 
-      className="fixed top-0 left-0 right-0 z-[100] bg-black/40 backdrop-blur-lg border-b border-white/10 shadow-lg"
-    >
+    <nav className="fixed top-0 left-0 right-0 z-[100] bg-black/40 backdrop-blur-lg border-b border-white/10 shadow-lg">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
+
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group animate-fade-in">
-            <img 
-              src={logo} 
-              alt="My Name THC" 
-              className="h-10 md:h-12 w-auto transition-all duration-500 group-hover:scale-110 group-hover:brightness-125" 
+          <Link to="/" className="flex items-center gap-2 group">
+            <img
+              src={logo}
+              alt="My Name THC"
+              className="h-10 md:h-12 w-auto transition-all duration-300 group-hover:scale-110 group-hover:brightness-125"
             />
             <div className="flex flex-col -space-y-1">
-              <span className="text-base md:text-lg font-bold transition-colors duration-300 group-hover:text-accent text-white">
+              <span className="text-base md:text-lg font-bold text-white group-hover:text-accent transition-colors">
                 My Name THC
               </span>
-              <span className="text-xs font-medium transition-colors duration-300 group-hover:text-accent hidden sm:block text-white/80">
+              <span className="text-xs font-medium text-white/80 group-hover:text-accent transition-colors hidden sm:block">
                 มายเนมทีเอชซี
               </span>
             </div>
           </Link>
-          
+
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6 animate-fade-in">
+          <div className="hidden md:flex items-center gap-6">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 className={`text-sm font-medium transition-all duration-300 hover:text-accent hover:scale-110 ${
-                  isActive(link.path) 
-                    ? "text-accent" 
-                    : "text-white"
+                  isActive(link.path) ? "text-accent" : "text-white"
                 }`}
               >
                 {link.label}
@@ -94,31 +88,40 @@ export const Navbar = () => {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full p-0 transition-transform duration-300 hover:scale-110">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full p-0 transition-transform hover:scale-110"
+                  >
                     <ProfileAvatar />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 animate-scale-in">
+
+                <DropdownMenuContent align="end" className="w-48">
                   <div className="px-2 py-1.5 text-sm">
                     <p className="font-medium truncate">{user.email}</p>
                   </div>
                   <DropdownMenuSeparator />
+
                   <DropdownMenuItem asChild>
-                    <Link to="/profile" className="cursor-pointer transition-colors duration-200">
+                    <Link to="/profile">
                       <User className="mr-2 h-4 w-4" />
                       Profile Settings
                     </Link>
                   </DropdownMenuItem>
+
                   {isAdmin && (
                     <DropdownMenuItem asChild>
-                      <Link to="/admin" className="cursor-pointer transition-colors duration-200">
+                      <Link to="/admin">
                         <Shield className="mr-2 h-4 w-4" />
                         Admin Dashboard
                       </Link>
                     </DropdownMenuItem>
                   )}
+
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer transition-colors duration-200">
+
+                  <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="mr-2 h-4 w-4" />
                     Sign Out
                   </DropdownMenuItem>
@@ -126,7 +129,7 @@ export const Navbar = () => {
               </DropdownMenu>
             ) : (
               <Link to="/auth">
-                <Button variant="premium" size="sm" className="transition-all duration-300 hover:scale-105">
+                <Button variant="premium" size="sm">
                   Sign In
                 </Button>
               </Link>
@@ -136,24 +139,26 @@ export const Navbar = () => {
           {/* Mobile Navigation */}
           <div className="flex md:hidden items-center gap-2">
             <ThemeToggle />
-            
+
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="text-white hover:text-accent"
-                >
+                <Button variant="ghost" size="icon" className="text-white">
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[280px] bg-background/95 backdrop-blur-lg">
-                <div className="flex flex-col gap-6 mt-8">
+
+              {/* ✅ FIXED RESPONSIVE SIDEBAR */}
+              <SheetContent
+                side="right"
+                className="w-[85vw] max-w-xs bg-background/95 backdrop-blur-lg p-6"
+              >
+                <div className="flex flex-col gap-6 mt-6">
+
                   {navLinks.map((link) => (
                     <SheetClose asChild key={link.path}>
                       <Link
                         to={link.path}
-                        className={`text-lg font-medium transition-all duration-300 hover:text-accent ${
+                        className={`text-lg font-medium transition-colors hover:text-accent ${
                           isActive(link.path) ? "text-accent" : "text-foreground"
                         }`}
                       >
@@ -161,28 +166,41 @@ export const Navbar = () => {
                       </Link>
                     </SheetClose>
                   ))}
-                  
+
+                  {/* User section */}
                   <div className="border-t border-border pt-4">
                     {user ? (
                       <div className="space-y-4">
-                        <p className="text-sm text-muted-foreground truncate">{user.email}</p>
+
+                        <p className="text-sm text-muted-foreground truncate">
+                          {user.email}
+                        </p>
+
                         <SheetClose asChild>
-                          <Link to="/profile" className="flex items-center gap-2 text-foreground hover:text-accent transition-colors">
+                          <Link
+                            to="/profile"
+                            className="flex items-center gap-2 hover:text-accent"
+                          >
                             <User className="h-4 w-4" />
                             Profile Settings
                           </Link>
                         </SheetClose>
+
                         {isAdmin && (
                           <SheetClose asChild>
-                            <Link to="/admin" className="flex items-center gap-2 text-foreground hover:text-accent transition-colors">
+                            <Link
+                              to="/admin"
+                              className="flex items-center gap-2 hover:text-accent"
+                            >
                               <Shield className="h-4 w-4" />
                               Admin Dashboard
                             </Link>
                           </SheetClose>
                         )}
-                        <Button 
-                          variant="destructive" 
-                          className="w-full" 
+
+                        <Button
+                          variant="destructive"
+                          className="w-full"
                           onClick={() => {
                             handleSignOut();
                             setMobileMenuOpen(false);
