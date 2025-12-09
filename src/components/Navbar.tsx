@@ -25,19 +25,21 @@ export const Navbar = () => {
   const location = useLocation();
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdmin();
-  const [isScrolled, setIsScrolled] = useState(false);
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
 
   const handleSignOut = async () => {
     await signOut();
+    setMobileMenuOpen(false);
   };
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => setIsScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const navLinks = [
@@ -48,7 +50,7 @@ export const Navbar = () => {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100] bg-black/40 backdrop-blur-lg border-b border-white/10 shadow-lg">
+    <nav className="fixed top-0 left-0 right-0 z-[100] bg-black/40 backdrop-blur-lg border-b border-white/10">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
 
@@ -57,15 +59,11 @@ export const Navbar = () => {
             <img
               src={logo}
               alt="My Name THC"
-              className="h-10 md:h-12 w-auto transition-all duration-300 group-hover:scale-110 group-hover:brightness-125"
+              className="h-10 w-auto transition-transform group-hover:scale-110"
             />
-            <div className="flex flex-col -space-y-1">
-              <span className="text-base md:text-lg font-bold text-white group-hover:text-accent transition-colors">
-                My Name THC
-              </span>
-              <span className="text-xs font-medium text-white/80 group-hover:text-accent transition-colors hidden sm:block">
-                มายเนมทีเอชซี
-              </span>
+            <div className="hidden sm:flex flex-col -space-y-1">
+              <span className="text-white font-semibold">My Name THC</span>
+              <span className="text-xs text-white/70">มายเนมทีเอชซี</span>
             </div>
           </Link>
 
@@ -75,7 +73,7 @@ export const Navbar = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`text-sm font-medium transition-all duration-300 hover:text-accent hover:scale-110 ${
+                className={`text-sm transition-colors hover:text-accent ${
                   isActive(link.path) ? "text-accent" : "text-white"
                 }`}
               >
@@ -88,25 +86,21 @@ export const Navbar = () => {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-full p-0 transition-transform hover:scale-110"
-                  >
+                  <Button variant="ghost" size="icon" className="rounded-full">
                     <ProfileAvatar />
                   </Button>
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end" className="w-48">
-                  <div className="px-2 py-1.5 text-sm">
-                    <p className="font-medium truncate">{user.email}</p>
+                  <div className="px-2 py-1.5 text-sm truncate">
+                    {user.email}
                   </div>
                   <DropdownMenuSeparator />
 
                   <DropdownMenuItem asChild>
                     <Link to="/profile">
                       <User className="mr-2 h-4 w-4" />
-                      Profile Settings
+                      Profile
                     </Link>
                   </DropdownMenuItem>
 
@@ -114,13 +108,12 @@ export const Navbar = () => {
                     <DropdownMenuItem asChild>
                       <Link to="/admin">
                         <Shield className="mr-2 h-4 w-4" />
-                        Admin Dashboard
+                        Admin
                       </Link>
                     </DropdownMenuItem>
                   )}
 
                   <DropdownMenuSeparator />
-
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="mr-2 h-4 w-4" />
                     Sign Out
@@ -137,113 +130,30 @@ export const Navbar = () => {
           </div>
 
           {/* Mobile Navigation */}
-          {/* Mobile Navigation */}
-<div className="flex md:hidden items-center gap-2">
-  <ThemeToggle />
+          <div className="flex md:hidden items-center gap-2">
+            <ThemeToggle />
 
-  <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-    <SheetTrigger asChild>
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        className="text-white hover:text-accent"
-      >
-        <Menu className="h-6 w-6" />
-      </Button>
-    </SheetTrigger>
-
-    {/* Fullscreen overlay */}
-    <SheetContent 
-      side="top" 
-      className="h-screen w-screen bg-black/70 backdrop-blur-xl border-none flex items-center justify-center p-0"
-    >
-      {/* Center popup card */}
-      <div className="bg-black/80 w-[90%] max-w-md rounded-xl p-6 space-y-6 shadow-2xl border border-white/10">
-
-        {/* Navigation */}
-        <div className="flex flex-col gap-4 text-lg font-medium">
-          {navLinks.map((link) => (
-            <SheetClose asChild key={link.path}>
-              <Link
-                to={link.path}
-                className={`transition-all hover:text-accent ${
-                  isActive(link.path) ? "text-accent" : "text-white"
-                }`}
-              >
-                {link.label}
-              </Link>
-            </SheetClose>
-          ))}
-        </div>
-
-        <div className="border-t border-white/10 pt-4 space-y-3">
-          {user ? (
-            <>
-              <p className="text-sm text-gray-400 truncate">{user.email}</p>
-
-              <SheetClose asChild>
-                <Link 
-                  to="/profile" 
-                  className="flex items-center gap-2 hover:text-accent text-white"
-                >
-                  <User className="h-4 w-4"/>
-                  Profile Settings
-                </Link>
-              </SheetClose>
-
-              {isAdmin && (
-                <SheetClose asChild>
-                  <Link 
-                    to="/admin" 
-                    className="flex items-center gap-2 hover:text-accent text-white"
-                  >
-                    <Shield className="h-4 w-4"/>
-                    Admin Dashboard
-                  </Link>
-                </SheetClose>
-              )}
-
-              <Button 
-                variant="destructive" 
-                className="w-full mt-3"
-                onClick={() => {
-                  handleSignOut();
-                  setMobileMenuOpen(false);
-                }}
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                Sign Out
-              </Button>
-            </>
-          ) : (
-            <SheetClose asChild>
-              <Link to="/auth">
-                <Button variant="premium" className="w-full">
-                  Sign In
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6 text-white" />
                 </Button>
-              </Link>
-            </SheetClose>
-          )}
-        </div>
-      </div>
-    </SheetContent>
-  </Sheet>
-</div>
+              </SheetTrigger>
 
-
-              {/* ✅ FIXED RESPONSIVE SIDEBAR */}
               <SheetContent
-                side="right"
-                className="w-[85vw] max-w-xs bg-background/95 backdrop-blur-lg p-6"
+                side="top"
+                className="h-screen bg-black/80 backdrop-blur-xl flex items-center justify-center"
               >
-                <div className="flex flex-col gap-6 mt-6">
+                <div className="w-full max-w-sm space-y-6 text-center">
 
                   {navLinks.map((link) => (
                     <SheetClose asChild key={link.path}>
                       <Link
                         to={link.path}
-                        className={`text-lg font-medium transition-colors hover:text-accent ${
-                          isActive(link.path) ? "text-accent" : "text-foreground"
+                        className={`block text-xl ${
+                          isActive(link.path)
+                            ? "text-accent"
+                            : "text-white"
                         }`}
                       >
                         {link.label}
@@ -251,33 +161,19 @@ export const Navbar = () => {
                     </SheetClose>
                   ))}
 
-                  {/* User section */}
-                  <div className="border-t border-border pt-4">
+                  <div className="border-t border-white/10 pt-4 space-y-3">
                     {user ? (
-                      <div className="space-y-4">
-
-                        <p className="text-sm text-muted-foreground truncate">
-                          {user.email}
-                        </p>
-
+                      <>
                         <SheetClose asChild>
-                          <Link
-                            to="/profile"
-                            className="flex items-center gap-2 hover:text-accent"
-                          >
-                            <User className="h-4 w-4" />
-                            Profile Settings
+                          <Link to="/profile" className="block text-white">
+                            Profile
                           </Link>
                         </SheetClose>
 
                         {isAdmin && (
                           <SheetClose asChild>
-                            <Link
-                              to="/admin"
-                              className="flex items-center gap-2 hover:text-accent"
-                            >
-                              <Shield className="h-4 w-4" />
-                              Admin Dashboard
+                            <Link to="/admin" className="block text-white">
+                              Admin
                             </Link>
                           </SheetClose>
                         )}
@@ -285,15 +181,11 @@ export const Navbar = () => {
                         <Button
                           variant="destructive"
                           className="w-full"
-                          onClick={() => {
-                            handleSignOut();
-                            setMobileMenuOpen(false);
-                          }}
+                          onClick={handleSignOut}
                         >
-                          <LogOut className="mr-2 h-4 w-4" />
                           Sign Out
                         </Button>
-                      </div>
+                      </>
                     ) : (
                       <SheetClose asChild>
                         <Link to="/auth">
@@ -308,6 +200,7 @@ export const Navbar = () => {
               </SheetContent>
             </Sheet>
           </div>
+
         </div>
       </div>
     </nav>
